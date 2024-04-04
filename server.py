@@ -24,11 +24,9 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if user is not None:
-            print(f"form password: {form.password.data}")
-            if form.password.data == user.hashed_password:
-                login_user(user, remember=form.remember_me.data)
-                return redirect("/")
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
@@ -36,12 +34,10 @@ def login():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
-        form = RegisterForm()
-        print(form)
-    # if form.validate_on_submit():
-        print(1)
-        if form.password.data != form.confirm_password.data:
+def reqister():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
@@ -50,17 +46,16 @@ def register():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        print('ok')
         user = User(
             name=form.name.data,
             email=form.email.data,
+            about=form.about.data
         )
-        print(user)
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    #return render_template('register.html', title='Регистрация', form=form)
+    return render_template('register.html', title='Регистрация', form=form)
 
 
 @app.route('/logout')
@@ -90,4 +85,4 @@ def bad_request(_):
 if __name__ == '__main__':
     db_session.global_init("database.db")
     port = int(os.environ.get("PORT", 5001))
-    app.run(host='127.0.0.1', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port)
