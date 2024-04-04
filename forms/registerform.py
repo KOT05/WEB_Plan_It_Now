@@ -5,11 +5,12 @@ from wtforms.validators import DataRequired
 
 
 class RegisterForm(FlaskForm):
-    ...
-    # email = EmailField('Почта', validators=[DataRequired()])
-    # password = PasswordField('Пароль', validators=[DataRequired()])
+    name = StringField('name', validators=[DataRequired()])
+    email = EmailField('email', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    confirm_password = PasswordField("confirm_password", validators=[DataRequired()])
     # remember_me = BooleanField('Запомнить меня')
-    # submit = SubmitField('Войти')
+    submit = SubmitField('Register')
 
 
 #TODO закончить файл с регистрацией
